@@ -1,6 +1,6 @@
 # Pinterest Clone
 
-Welcome to the Pinterest Clone project! This is a web application created using Node.js, Express, MongoDB, and Tailwind CSS, aiming to replicate the core functionalities of Pinterest. You can access the live version of the app [here](#).
+Welcome to the Pinterest Clone project! This is a web application created using Node.js, Express, MongoDB, and Tailwind CSS, aiming to replicate the core functionalities of Pinterest. You can access the live version of the app [here](https://pininspire.onrender.com/).
 
 ## Features
 
