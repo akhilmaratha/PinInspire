@@ -43,7 +43,7 @@ const UserProfile = ({ user: loggedInUser }) => {
 
   useEffect(() => {
     fetchUser();
-  }, []);
+  }, [params.id]);
   return (
     <div>
       {user && (

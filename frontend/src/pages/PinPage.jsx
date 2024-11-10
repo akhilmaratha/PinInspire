@@ -177,8 +177,8 @@ const PinPage = ({ user }) => {
 
                 <div className="overflow-y-auto h-64">
                   {pin.comments && pin.comments.length > 0 ? (
-                    pin.comments.map((e, i) => (
-                      <div className="flex items-center justify-between mb-4">
+                    pin.comments.map((e) => (
+                      <div key={e._id} className="flex items-center justify-between mb-4">
                         <div className="flex items-center mb-4 justify-center gap-3">
                           <Link to={`/user/${e.user}`}>
                             <div className="rounded-full h-12 w-12 bg-gray-300 flex items-center justify-center">

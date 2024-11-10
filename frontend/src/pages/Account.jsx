@@ -73,12 +73,12 @@ const UserProfile = ({ user }) => {
           >
             Created Pins
           </button>
-          <button
+          {/* <button
             className={`flex-1 py-2 px-4 text-center ${activeTab === 'saved' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-700'} rounded-r-lg transition-colors duration-300`}
             onClick={() => handleTabChange('saved')}
           >
             Saved Pins
-          </button>
+          </button> */}
         </div>
         {activeTab === 'created' && (
           userPins && userPins.length > 0 ? (
@@ -87,13 +87,13 @@ const UserProfile = ({ user }) => {
             <p className="text-center text-gray-600">No Pins Created Yet</p>
           )
         )}
-        {activeTab === 'saved' && (
+        {/* {activeTab === 'saved' && (
           user.savedPins && user.savedPins.length > 0 ? (
             renderPins(user.savedPins)
           ) : (
             <p className="text-center text-gray-600">No Pins Saved Yet</p>
           )
-        )}
+        )} */}
       </div>
     </div>
   );

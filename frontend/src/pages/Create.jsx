@@ -1,68 +1,20 @@
-'use client';
-
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { FaImage, FaPlus } from "react-icons/fa";
 import { PinData } from "../context/PinContext";
 import { useNavigate } from "react-router-dom";
 
-export default function CreatePin() {
-  // Reusable Button component
-  const Button = ({ variant = 'solid', children, ...props }) => {
-    return (
-      <button
-        {...props}
-        className={`px-4 py-2 rounded ${variant === 'outline' ? 'border border-gray-300 text-gray-700' : 'bg-blue-500 text-white'}`}
-      >
-        {children}
-      </button>
-    );
-  };
-
-  // Reusable Input component
-  const Input = (props) => {
-    return (
-      <input
-        {...props}
-        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-      />
-    );
-  };
-
-  // Reusable Textarea component
-  const Textarea = (props) => {
-    return (
-      <textarea
-        {...props}
-        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-      />
-    );
-  };
-
-  // Reusable Card component
-  const Card = ({ children, className }) => {
-    return (
-      <div className={`bg-white shadow-lg rounded-lg ${className}`}>
-        {children}
-      </div>
-    );
-  };
-
-  // Reusable CardContent component
-  const CardContent = ({ children }) => {
-    return <div className="p-4">{children}</div>;
-  };
-
-  // State and logic for CreatePin component
+const CreatePin = () => {
+  // State declarations
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
   const [pin, setPin] = useState('');
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [file, setFile] = useState(null);
+  const [filePrev, setFilePrev] = useState(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
   const { addPin } = PinData();
   const navigate = useNavigate();
 
+  // Event Handlers
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -73,44 +25,67 @@ export default function CreatePin() {
     }
   };
 
+  const handleFileChange = (file) => {
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('File size should be less than 10MB');
+      return;
+    }
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid image file (JPG, PNG, or GIF)');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setFilePrev(reader.result);
+      setFile(file);
+    };
+  };
+
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      setImage(file);
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => setImagePreview(reader.result);
+      handleFileChange(e.dataTransfer.files[0]);
     }
   };
 
   const handleChange = (e) => {
-    e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImage(file);
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => setImagePreview(reader.result);
+      handleFileChange(e.target.files[0]);
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("pin", pin);
-    if (image) formData.append("file", image);
-    addPin(formData, setImagePreview, setImage, setTitle, setDescription, navigate);
+    
+    try {
+      if (!file) {
+        alert('Please select an image');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("pin", pin);
+      formData.append("file", file);
+
+      await addPin(formData, setFilePrev, setFile, setTitle, setPin, navigate);
+    } catch (error) {
+      console.error('Error uploading pin:', error);
+      alert('Error uploading pin. Please try again.');
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardContent>
+      <div className="bg-white shadow-lg rounded-lg w-full max-w-md">
+        <div className="p-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <h2 className="text-2xl font-bold text-center mb-6">Create a New Pin</h2>
 
@@ -124,8 +99,8 @@ export default function CreatePin() {
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
             >
-              {imagePreview ? (
-                <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover mb-2" />
+              {filePrev ? (
+                <img src={filePrev} alt="Preview" className="w-full h-48 object-cover mb-2" />
               ) : (
                 <div className="text-gray-500">
                   <FaImage className="mx-auto h-12 w-12 mb-2" />
@@ -142,41 +117,58 @@ export default function CreatePin() {
               />
             </div>
 
-            <Input
-              type="text"
-              placeholder="Add your title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+                  Title
+                </label>
+                <input
+                  id="title"
+                  type="text"
+                  placeholder="Add your title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                />
+              </div>
 
-            <Textarea
-              placeholder="Tell everyone what your Pin is about"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              required
-            />
-
-            <Input
-              type="text"
-              placeholder="Pin"
-              value={pin}
-              onChange={(e) => setPin(e.target.value)}
-              required
-            />
+              <div>
+                <label htmlFor="pin" className="block text-sm font-medium text-gray-700 mb-1">
+                  Pin
+                </label>
+                <input
+                  id="pin"
+                  type="text"
+                  placeholder="Add your pin"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  required
+                  className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
 
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" type="button" onClick={() => navigate(-1)}>
+              <button
+                type="button"
+                onClick={() => navigate(-1)}
+                className="px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
                 Cancel
-              </Button>
-              <Button type="submit">
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+              >
                 <FaPlus className="inline-block mr-1" /> Create Pin
-              </Button>
+              </button>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default CreatePin;

@@ -10,7 +10,7 @@ dotenv.config();
 cloudinary.v2.config({
     cloud_name: process.env.CLOUD_NAME,
     api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET,
+    api_secret: process.env.CLOUD_SECRET_KEY,
   
 });
 
@@ -32,6 +32,12 @@ import pinRoutes from './routes/pinRoutes.js';
 app.use("/api/user",userRoutes)
 app.use("/api/pin",pinRoutes)
 
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname,"/frontend/dist")));
+
+app.get("*",(req,res)=>{
+    res.sendFile(path.join(__dirname,"frontend","dist","index.html"));
+})
 
 app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);
