@@ -3,30 +3,6 @@ import TryCatch from "../utils/TryCatch.js";
 import getDataUri from "../utils/urlGenerator.js";
 import cloudinary from "cloudinary";
 
-// export const createPin = TryCatch(async (req, res) => {
-// const file = req.file;
-// if (!file) {
-//     return res.status(400).json({
-//         message: "Please upload an image"
-//     });
-// }
-// const fileUrl = await getDataUrl(file);
-// const cloud = await cloudinary.v2.uploader.upload(fileUrl.content);
-
-//   await Pin.create({
-//     title,
-//     pin,
-//     image: {
-//       id: cloud.public_id,
-//       url: cloud.secure_url,
-//     },
-//     owner: req.user._id,
-//   });
-
-//   res.json({
-//     message: "Pin Created",
-//   });
-// });
 export const createPin = TryCatch(async (req, res) => {
   const { title, pin } = req.body;
   const file = req.file;
@@ -38,7 +14,7 @@ export const createPin = TryCatch(async (req, res) => {
   }
 
   try {
-    const fileUri =  getDataUri(file);
+    const fileUri =  await getDataUri(file);
     
     const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
       folder: "pinterest",

@@ -17,6 +17,7 @@ const Login = () => {
     e.preventDefault();
     loginUser(email, password, navigate, fetchPins);
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -81,7 +82,7 @@ const Login = () => {
 
           <div className="mt-4 text-center text-sm">
             <span>
-              Not on Pinterest yet?
+              Not on Pinterest yet?{" "}
               <Link
                 to="/register"
                 className="font-medium text-pinterest hover:underline"
