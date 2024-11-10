@@ -4,8 +4,9 @@ import bcrypt from "bcrypt";
 import generateToken from "../utils/generateToken.js";
 import tryCatch from "../utils/tryCatch.js";
 
-export const registerUser = tryCatch(async (req, res) => {
-  const { name, email, password } = req.body;
+export const registerUser = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
 
   let user = await User.findOne({ email });
 
@@ -23,12 +24,13 @@ export const registerUser = tryCatch(async (req, res) => {
   });
 
   generateToken(user._id, res);
-
-  res.status(201).json({
+  } catch (error) {
+    res.status(201).json({
     user,
     message: "User Registered",
   });
-});
+  }
+};
 
 export const loginUser = tryCatch(async (req, res) => {
   const { email, password } = req.body;
