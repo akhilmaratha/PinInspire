@@ -8,27 +8,31 @@ export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-  let user = await User.findOne({ email });
+    let user = await User.findOne({ email });
 
-  if (user)
-    return res.status(400).json({
-      message: "Already have an account with this email",
+    if (user)
+      return res.status(400).json({
+        message: "Already have an account with this email",
+      });
+
+    const hashPassword = await bcrypt.hash(password, 10);
+
+    user = await User.create({
+      name,
+      email,
+      password: hashPassword,
     });
 
-  const hashPassword = await bcrypt.hash(password, 10);
-
-  user = await User.create({
-    name,
-    email,
-    password: hashPassword,
-  });
-
-  generateToken(user._id, res);
-  } catch (error) {
+    generateToken(user._id, res);
+    
     res.status(201).json({
-    user,
-    message: "User Registered",
-  });
+      user,
+      message: "User Registered",
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 

@@ -14,7 +14,7 @@ export const createPin = tryCatch(async (req, res) => {
   }
 
   try {
-    const fileUri =  await getDataUri(file);
+    const fileUri =  getDataUri(file);
     
     const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
       folder: "pinterest",
