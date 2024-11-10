@@ -9,6 +9,7 @@ import PinPage from "./pages/PinPage";
 import Create from "./pages/Create";
 import Account from "./pages/Account";
 import UserProfile from "./pages/UserProfile";
+import NotFound from "./components/Notfound";
 
 const App = () => {
   const { loading, isAuth, user } = UserData();
@@ -41,6 +42,7 @@ const App = () => {
               path="/register"
               element={isAuth ? <Home /> : <Register />}
             />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       )}
