@@ -1,20 +1,19 @@
 import { Pin } from "../models/pinModel.js";
-import tryCatch from "../utils/tryCatch.js";
 import getDataUri from "../utils/urlGenerator.js";
 import cloudinary from "cloudinary";
 
-export const createPin = tryCatch(async (req, res) => {
-  const { title, pin } = req.body;
-  const file = req.file;
-  
-  if (!file) {
-    return res.status(400).json({
-      message: "Please upload an image"
-    });
-  }
-
+export const createPin = async (req, res) => {
   try {
-    const fileUri =  getDataUri(file);
+    const { title, pin } = req.body;
+    const file = req.file;
+    
+    if (!file) {
+      return res.status(400).json({
+        message: "Please upload an image"
+      });
+    }
+
+    const fileUri = getDataUri(file);
     
     const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
       folder: "pinterest",
@@ -35,126 +34,158 @@ export const createPin = tryCatch(async (req, res) => {
       message: "Pin Created Successfully"
     });
   } catch (error) {
-    console.error("Cloudinary Error:", error);
-    return res.status(500).json({
-      message: "Error uploading image to Cloudinary"
+    console.error("Error:", error);
+    res.status(500).json({
+      message: error.message
     });
   }
-});
-export const getAllPins = tryCatch(async (req, res) => {
-  const pins = await Pin.find().sort({ createdAt: -1 });
+};
 
-  res.json(pins);
-});
-
-export const getSinglePin = tryCatch(async (req, res) => {
-  const pin = await Pin.findById(req.params.id).populate("owner", "-password");
-
-  res.json(pin);
-});
-
-export const commentOnPin = tryCatch(async (req, res) => {
-  const pin = await Pin.findById(req.params.id);
-
-  if (!pin)
-    return res.status(400).json({
-      message: "No Pin with this id",
-    });
-
-  pin.comments.push({
-    user: req.user._id,
-    name: req.user.name,
-    comment: req.body.comment,
-  });
-
-  await pin.save();
-
-  res.json({
-    message: "Comment Added",
-  });
-});
-
-export const deleteComment = tryCatch(async (req, res) => {
-  const pin = await Pin.findById(req.params.id);
-
-  if (!pin)
-    return res.status(400).json({
-      message: "No Pin with this id",
-    });
-
-  if (!req.query.commentId)
-    return res.status(404).json({
-      message: "Please give comment id",
-    });
-
-  const commentIndex = pin.comments.findIndex(
-    (item) => item._id.toString() === req.query.commentId.toString()
-  );
-
-  if (commentIndex === -1) {
-    return res.status(404).json({
-      message: "Comment not found",
+export const getAllPins = async (req, res) => {
+  try {
+    const pins = await Pin.find().sort({ createdAt: -1 });
+    res.json(pins);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
     });
   }
+};
 
-  const comment = pin.comments[commentIndex];
+export const getSinglePin = async (req, res) => {
+  try {
+    const pin = await Pin.findById(req.params.id).populate("owner", "-password");
+    res.json(pin);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
 
-  if (comment.user.toString() === req.user._id.toString()) {
-    pin.comments.splice(commentIndex, 1);
+export const commentOnPin = async (req, res) => {
+  try {
+    const pin = await Pin.findById(req.params.id);
+
+    if (!pin)
+      return res.status(400).json({
+        message: "No Pin with this id",
+      });
+
+    pin.comments.push({
+      user: req.user._id,
+      name: req.user.name,
+      comment: req.body.comment,
+    });
 
     await pin.save();
 
-    return res.json({
-      message: "Comment Deleted",
+    res.json({
+      message: "Comment Added",
     });
-  } else {
-    return res.status(403).json({
-      message: "You are not owner of this comment",
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
     });
   }
-});
+};
 
-export const deletePin = tryCatch(async (req, res) => {
-  const pin = await Pin.findById(req.params.id);
+export const deleteComment = async (req, res) => {
+  try {
+    const pin = await Pin.findById(req.params.id);
 
-  if (!pin)
-    return res.status(400).json({
-      message: "No Pin with this id",
+    if (!pin)
+      return res.status(400).json({
+        message: "No Pin with this id",
+      });
+
+    if (!req.query.commentId)
+      return res.status(404).json({
+        message: "Please give comment id",
+      });
+
+    const commentIndex = pin.comments.findIndex(
+      (item) => item._id.toString() === req.query.commentId.toString()
+    );
+
+    if (commentIndex === -1) {
+      return res.status(404).json({
+        message: "Comment not found",
+      });
+    }
+
+    const comment = pin.comments[commentIndex];
+
+    if (comment.user.toString() === req.user._id.toString()) {
+      pin.comments.splice(commentIndex, 1);
+      await pin.save();
+      return res.json({
+        message: "Comment Deleted",
+      });
+    } else {
+      return res.status(403).json({
+        message: "You are not owner of this comment",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
     });
+  }
+};
 
-  if (pin.owner.toString() !== req.user._id.toString())
-    return res.status(403).json({
-      message: "Unauthorized",
+export const deletePin = async (req, res) => {
+  try {
+    const pin = await Pin.findById(req.params.id);
+
+    if (!pin)
+      return res.status(400).json({
+        message: "No Pin with this id",
+      });
+
+    if (pin.owner.toString() !== req.user._id.toString())
+      return res.status(403).json({
+        message: "Unauthorized",
+      });
+
+    await cloudinary.v2.uploader.destroy(pin.image.id);
+    await pin.deleteOne();
+
+    res.json({
+      message: "Pin Deleted",
     });
-
-  await cloudinary.v2.uploader.destroy(pin.image.id);
-
-  await pin.deleteOne();
-
-  res.json({
-    message: "Pin Deleted",
-  });
-});
-
-export const updatePin = tryCatch(async (req, res) => {
-  const pin = await Pin.findById(req.params.id);
-
-  if (!pin)
-    return res.status(400).json({
-      message: "No Pin with this id",
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
     });
+  }
+};
 
-  if (pin.owner.toString() !== req.user._id.toString())
-    return res.status(403).json({
-      message: "Unauthorized",
+export const updatePin = async (req, res) => {
+  try {
+    const pin = await Pin.findById(req.params.id);
+
+    if (!pin)
+      return res.status(400).json({
+        message: "No Pin with this id",
+      });
+
+    if (pin.owner.toString() !== req.user._id.toString())
+      return res.status(403).json({
+        message: "Unauthorized",
+      });
+
+    pin.title = req.body.title;
+    pin.pin = req.body.pin;
+
+    await pin.save();
+
+    res.json({
+      message: "Pin updated",
     });
-
-  pin.title = req.body.title;
-  pin.pin = req.body.pin;
-
-  await pin.save();
-
-  res.json({
-    message: "Pin updated",
-  });
-});
+  } catch (error) {
+    res.status(500).json({
+      message: error.message
+    });
+  }
+};
