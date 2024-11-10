@@ -1,5 +1,5 @@
 import { Pin } from "../models/pinModel.js";
-import TryCatch from "../utils/TryCatch.js";
+import TryCatch from "../utils/Trycatch.js";
 import getDataUri from "../utils/urlGenerator.js";
 import cloudinary from "cloudinary";
 
