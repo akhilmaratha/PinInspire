@@ -47,14 +47,14 @@ const UserProfile = ({ user }) => {
       <div className="bg-white rounded-lg shadow-md p-8 mb-8">
         <div className="flex flex-col items-center">
           <div className="w-32 h-32 rounded-full overflow-hidden mb-4">
-            <img src={user.profilePicture || "/placeholder.svg?height=128&width=128"} alt={user.name} className="w-full h-full object-cover " />
+            {/* <img src={user.profilePicture || "/placeholder.svg?height=128&width=128"}  className="w-full h-full object-cover " /> */}
           </div>
           <h1 className="text-2xl font-bold mb-2 text-gray-800">{user.name}</h1>
           {/* <p className="text-gray-600 mb-2">@{user.username}</p> */}
           <p className="text-center max-w-md mb-4 text-gray-700">{user.bio || "No bio available"}</p>
           <div className="flex gap-4 text-sm text-gray-600">
-            <span>{user.followers || 0} followers</span>
-            <span>{user.following || 0} following</span>
+            <span>{user.followers.length || 0} followers</span>
+            <span>{user.following.length || 0} following</span>
           </div>
           <button
             onClick={logoutHandler}

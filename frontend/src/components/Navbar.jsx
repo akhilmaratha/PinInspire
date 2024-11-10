@@ -23,7 +23,7 @@ const Navbar = ({ user }) => {
               <input
                 type="search"
                 placeholder="Search for ideas"
-                className="w-full rounded-full border-gray-300 pl-10 pr-4"
+                className="w-full h-10 border rounded-full border-black pl-10 pr-4"
               />
             </div>
           </div>
