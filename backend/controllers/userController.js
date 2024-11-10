@@ -2,9 +2,9 @@ import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt";
 
 import generateToken from "../utils/generateToken.js";
-import TryCatch from "../utils/Trycatch.js";
+import tryCatch from "../utils/tryCatch.js";
 
-export const registerUser = TryCatch(async (req, res) => {
+export const registerUser = tryCatch(async (req, res) => {
   const { name, email, password } = req.body;
 
   let user = await User.findOne({ email });
@@ -30,7 +30,7 @@ export const registerUser = TryCatch(async (req, res) => {
   });
 });
 
-export const loginUser = TryCatch(async (req, res) => {
+export const loginUser = tryCatch(async (req, res) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -55,18 +55,18 @@ export const loginUser = TryCatch(async (req, res) => {
   });
 });
 
-export const myProfile = TryCatch(async (req, res) => {
+export const myProfile = tryCatch(async (req, res) => {
   const user = await User.findById(req.user._id);
   res.json(user);
 });
 
-export const userProfile = TryCatch(async (req, res) => {
+export const userProfile = tryCatch(async (req, res) => {
   const user = await User.findById(req.params.id).select("-password");
 
   res.json(user);
 });
 
-export const followAndUnfollowUser = TryCatch(async (req, res) => {
+export const followAndUnfollowUser = tryCatch(async (req, res) => {
   const user = await User.findById(req.params.id);
   const loggedInUser = await User.findById(req.user._id);
 
@@ -106,7 +106,7 @@ export const followAndUnfollowUser = TryCatch(async (req, res) => {
   }
 });
 
-export const logOutUser = TryCatch(async (req, res) => {
+export const logOutUser = tryCatch(async (req, res) => {
   res.cookie("token", "", {
     maxAge: 0,
     httpOnly: true,

@@ -1,9 +1,9 @@
 import { Pin } from "../models/pinModel.js";
-import TryCatch from "../utils/Trycatch.js";
+import tryCatch from "../utils/tryCatch.js";
 import getDataUri from "../utils/urlGenerator.js";
 import cloudinary from "cloudinary";
 
-export const createPin = TryCatch(async (req, res) => {
+export const createPin = tryCatch(async (req, res) => {
   const { title, pin } = req.body;
   const file = req.file;
   
@@ -41,19 +41,19 @@ export const createPin = TryCatch(async (req, res) => {
     });
   }
 });
-export const getAllPins = TryCatch(async (req, res) => {
+export const getAllPins = tryCatch(async (req, res) => {
   const pins = await Pin.find().sort({ createdAt: -1 });
 
   res.json(pins);
 });
 
-export const getSinglePin = TryCatch(async (req, res) => {
+export const getSinglePin = tryCatch(async (req, res) => {
   const pin = await Pin.findById(req.params.id).populate("owner", "-password");
 
   res.json(pin);
 });
 
-export const commentOnPin = TryCatch(async (req, res) => {
+export const commentOnPin = tryCatch(async (req, res) => {
   const pin = await Pin.findById(req.params.id);
 
   if (!pin)
@@ -74,7 +74,7 @@ export const commentOnPin = TryCatch(async (req, res) => {
   });
 });
 
-export const deleteComment = TryCatch(async (req, res) => {
+export const deleteComment = tryCatch(async (req, res) => {
   const pin = await Pin.findById(req.params.id);
 
   if (!pin)
@@ -114,7 +114,7 @@ export const deleteComment = TryCatch(async (req, res) => {
   }
 });
 
-export const deletePin = TryCatch(async (req, res) => {
+export const deletePin = tryCatch(async (req, res) => {
   const pin = await Pin.findById(req.params.id);
 
   if (!pin)
@@ -136,7 +136,7 @@ export const deletePin = TryCatch(async (req, res) => {
   });
 });
 
-export const updatePin = TryCatch(async (req, res) => {
+export const updatePin = tryCatch(async (req, res) => {
   const pin = await Pin.findById(req.params.id);
 
   if (!pin)
