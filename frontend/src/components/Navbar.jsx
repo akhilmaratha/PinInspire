@@ -46,8 +46,9 @@ const Navbar = ({ user }) => {
             <Link
               to="/account"
               className="h-11 w-11 rounded-full bg-gray-300 flex items-center justify-center text-xl text-gray-700"
-            ><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Pinterest-logo.png/600px-Pinterest-logo.png" alt="" />
-              {user?.name?.slice(0, 1) || <FaUser className="h-5 w-5" />}
+            >
+            {/* <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Pinterest-logo.png/600px-Pinterest-logo.png" alt="" /> */}
+              {user?.name?.slice(0, 1).toUpperCase() || <FaUser className="h-5 w-5" />}
             </Link>
           </div>
         </div>

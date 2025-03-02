@@ -4,7 +4,8 @@ import { followAndUnfollowUser,
     logOutUser, 
     myProfile, 
     registerUser, 
-    userProfile } from '../controllers/userController.js';
+    userProfile,
+    updateUser } from '../controllers/userController.js';
 import { isAuth } from '../middleware/isAuth.js';
 
 const router=express.Router();
@@ -15,6 +16,7 @@ router.get("/me", isAuth, myProfile);
 router.get("/logout", isAuth, logOutUser);
 router.get('/:id',isAuth,userProfile);
 router.post('/follow/:id',isAuth,followAndUnfollowUser);
+router.put('/update', isAuth, updateUser);
 
 
 

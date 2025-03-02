@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState([]);
   const [isAuth, setIsAuth] = useState(false);
   const [btnLoading, setBtnLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   async function registerUser(name, email, password, navigate, fetchPins) {
     setBtnLoading(true);
@@ -47,8 +48,6 @@ export const UserProvider = ({ children }) => {
     }
   }
 
-  const [loading, setLoading] = useState(true);
-
   async function fetchUser() {
     try {
       const { data } = await axios.get("/api/user/me");
@@ -73,9 +72,21 @@ export const UserProvider = ({ children }) => {
     }
   }
 
+  // New function to update user data
+  async function updateUser(updatedData) {
+    try {
+      const { data } = await axios.put("/api/user/update", updatedData);
+      toast.success(data.message);
+      setUser(data.user); // Update the user state with new data
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  }
+
   useEffect(() => {
     fetchUser();
   }, []);
+
   return (
     <UserContext.Provider
       value={{
@@ -88,6 +99,7 @@ export const UserProvider = ({ children }) => {
         setIsAuth,
         setUser,
         followUser,
+        updateUser, // Provide the updateUser function
       }}
     >
       {children}

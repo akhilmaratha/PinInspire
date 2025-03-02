@@ -10,13 +10,14 @@ import Create from "./pages/Create";
 import Account from "./pages/Account";
 import UserProfile from "./pages/UserProfile";
 import NotFound from "./components/Notfound";
+import ErrorBoundary from './components/ErrorBoundary';
 
 const App = () => {
   const { loading, isAuth, user } = UserData();
   // console.log(user);
   
   return (
-    <>
+    <ErrorBoundary>
       {loading ? (
         <Loading />
       ) : (
@@ -46,7 +47,7 @@ const App = () => {
           </Routes>
         </BrowserRouter>
       )}
-    </>
+    </ErrorBoundary>
   );
 };
 

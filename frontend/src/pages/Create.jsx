@@ -13,6 +13,7 @@ const CreatePin = () => {
   const fileInputRef = useRef(null);
   const { addPin } = PinData();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   // Event Handlers
   const handleDrag = (e) => {
@@ -63,10 +64,11 @@ const CreatePin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setLoading(true);
     try {
       if (!file) {
         alert('Please select an image');
+        setLoading(false);
         return;
       }
 
@@ -79,6 +81,8 @@ const CreatePin = () => {
     } catch (error) {
       console.error('Error uploading pin:', error);
       alert('Error uploading pin. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -159,9 +163,10 @@ const CreatePin = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600"
+                className={`px-4 py-2 rounded ${loading ? 'bg-gray-400' : 'bg-blue-500'} text-white hover:bg-blue-600`}
+                disabled={loading}
               >
-                <FaPlus className="inline-block mr-1" /> Create Pin
+                {loading ? 'Loading...' : <><FaPlus className="inline-block mr-1" /> Create Pin</>}
               </button>
             </div>
           </form>
