@@ -147,14 +147,18 @@ export const PinProvider = ({ children }) => {
       });
 
       toast.success(data.message);
+      
+      // Reset form fields
       setFile([]);
       setFilePrev("");
       setPin("");
       setTitle("");
-      fetchPins();
+      
+      // Fetch the updated pins list
+      await fetchPins();
       navigate("/");
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || 'Failed to create pin');
     }
   }
 
