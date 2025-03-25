@@ -11,6 +11,11 @@ export const PinProvider = ({ children }) => {
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pin, setPin] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredPins = pins.filter(pin =>
+    pin.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   async function fetchPins() {
     try {
@@ -178,6 +183,9 @@ export const PinProvider = ({ children }) => {
         deletePin,
         addPin,
         fetchPins,
+        searchQuery,
+        setSearchQuery,
+        filteredPins,
       }}
     >
       {children}

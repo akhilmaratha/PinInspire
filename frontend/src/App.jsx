@@ -11,6 +11,7 @@ import Account from "./pages/Account";
 import UserProfile from "./pages/UserProfile";
 import NotFound from "./components/Notfound";
 import ErrorBoundary from './components/ErrorBoundary';
+import { PinProvider } from './context/PinContext';
 
 const App = () => {
   const { loading, isAuth, user } = UserData();
@@ -22,29 +23,31 @@ const App = () => {
         <Loading />
       ) : (
         <BrowserRouter>
-          {isAuth && <Navbar user={user} />}
-          <Routes>
-            <Route path="/" element={isAuth ? <Home /> : <Login />} />
-            <Route
-              path="/account"
-              element={isAuth ? <Account user={user} /> : <Login />}
-            />
-            <Route
-              path="/user/:id"
-              element={isAuth ? <UserProfile user={user} /> : <Login />}
-            />
-            <Route path="/create" element={isAuth ? <Create /> : <Login />} />
-            <Route
-              path="/pin/:id"
-              element={isAuth ? <PinPage user={user} /> : <Login />}
-            />
-            <Route path="/login" element={isAuth ? <Home /> : <Login />} />
-            <Route
-              path="/register"
-              element={isAuth ? <Home /> : <Register />}
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <PinProvider>
+            {isAuth && <Navbar user={user} />}
+            <Routes>
+              <Route path="/" element={isAuth ? <Home /> : <Login />} />
+              <Route
+                path="/account"
+                element={isAuth ? <Account user={user} /> : <Login />}
+              />
+              <Route
+                path="/user/:id"
+                element={isAuth ? <UserProfile user={user} /> : <Login />}
+              />
+              <Route path="/create" element={isAuth ? <Create /> : <Login />} />
+              <Route
+                path="/pin/:id"
+                element={isAuth ? <PinPage user={user} /> : <Login />}
+              />
+              <Route path="/login" element={isAuth ? <Home /> : <Login />} />
+              <Route
+                path="/register"
+                element={isAuth ? <Home /> : <Register />}
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </PinProvider>
         </BrowserRouter>
       )}
     </ErrorBoundary>
