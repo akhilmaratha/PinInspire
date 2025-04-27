@@ -46,6 +46,25 @@ const ScrollArea = ({ className = '', children }) => (
   </div>
 )
 
+// Delete Confirmation Modal
+const DeleteConfirmationModal = ({ open, onClose, onConfirm, message }) => {
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-xs">
+        <div className="mb-4 text-center">
+          <p className="text-lg font-semibold mb-2">Confirm Delete</p>
+          <p className="text-gray-700">{message}</p>
+        </div>
+        <div className="flex gap-4 justify-center">
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button variant="primary" onClick={onConfirm}>Delete</Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function PinDetail({ user }) {
   const params = useParams()
   const navigate = useNavigate()
@@ -55,6 +74,34 @@ function PinDetail({ user }) {
   const [title, setTitle] = useState("")
   const [pinValue, setPinValue] = useState("")
   const [comment, setComment] = useState("")
+
+  // Modal state
+  const [deleteModal, setDeleteModal] = useState({ open: false, type: null, commentId: null })
+
+  // --- Save Pin Section ---
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  useEffect(() => {
+    if (pin && user && pin._id) {
+      setSaved(user.savedPins && user.savedPins.includes(pin._id));
+    }
+  }, [pin, user]);
+
+  const handleSavePin = async () => {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/pin/save/${pin._id}`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await res.json();
+      setSaved(data.saved);
+    } catch (err) {
+      // Optionally show error
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     fetchPin(params.id)
@@ -81,19 +128,40 @@ function PinDetail({ user }) {
   }
 
   const deleteCommentHandler = (id) => {
-    if (window.confirm("Are you sure you want to delete this comment?"))
-      deleteComment(pin._id, id)
+    setDeleteModal({ open: true, type: 'comment', commentId: id })
   }
 
   const deletePinHandler = () => {
-    if (window.confirm("Are you sure you want to delete this pin?"))
+    setDeleteModal({ open: true, type: 'pin', commentId: null })
+  }
+
+  const handleModalClose = () => {
+    setDeleteModal({ open: false, type: null, commentId: null })
+  }
+
+  const handleModalConfirm = () => {
+    if (deleteModal.type === 'comment') {
+      deleteComment(pin._id, deleteModal.commentId)
+    } else if (deleteModal.type === 'pin') {
       deletePin(pin._id, navigate)
+    }
+    handleModalClose()
   }
 
   if (loading) return <Loading />
 
   return (
     <div className="container mx-auto px-4 py-11 mt-20 min-h-screen">
+      <DeleteConfirmationModal
+        open={deleteModal.open}
+        onClose={handleModalClose}
+        onConfirm={handleModalConfirm}
+        message={
+          deleteModal.type === 'comment'
+            ? 'Are you sure you want to delete this comment?'
+            : 'Are you sure you want to delete this pin?'
+        }
+      />
       {pin && (
         <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="relative aspect-square">
@@ -119,7 +187,7 @@ function PinDetail({ user }) {
                 </div>
               </div>
               <div className="flex gap-2">
-                {pin.owner && pin.owner._id === user._id && (
+                {pin.owner && pin.owner._id === user._id ? (
                   <>
                     <Button variant="outline" size="sm" onClick={editHandler}>
                       <MdEdit className="h-4 w-4" />
@@ -128,6 +196,11 @@ function PinDetail({ user }) {
                       <MdDelete className="h-4 w-4" />
                     </Button>
                   </>
+                ) : (
+                  <Button variant={saved ? 'primary' : 'outline'} size="sm" onClick={handleSavePin} disabled={saving}>
+                    <MdBookmark className="mr-2 h-4 w-4" />
+                    {saving ? 'Saving...' : saved ? 'Saved' : 'Save'}
+                  </Button>
                 )}
                 <Button variant="outline" size="sm">
                   <MdMoreHoriz className="h-4 w-4" />

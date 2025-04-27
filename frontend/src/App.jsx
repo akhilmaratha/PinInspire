@@ -14,9 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { PinProvider } from './context/PinContext';
 
 const App = () => {
-  const { loading, isAuth, user } = UserData();
-  // console.log(user);
-  
+  const { loading, isAuth, user } = UserData();  
   return (
     <ErrorBoundary>
       {loading ? (

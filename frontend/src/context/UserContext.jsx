@@ -51,7 +51,7 @@ export const UserProvider = ({ children }) => {
   async function fetchUser() {
     try {
       const { data } = await axios.get("/api/user/me");
-
+// console.log(data)
       setUser(data);
       setIsAuth(true);
       setLoading(false);

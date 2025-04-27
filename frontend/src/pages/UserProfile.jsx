@@ -19,12 +19,14 @@ const UserProfile = ({ user: loggedInUser }) => {
   }
 
   const [isFollow, setIsFollow] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   const { followUser } = UserData();
 
-  const followHander = () => {
-    setIsFollow(!isFollow);
-    followUser(user._id, fetchUser);
+  const followHander = async () => {
+    setFollowLoading(true);
+    await followUser(user._id, fetchUser);
+    setFollowLoading(false);
   };
 
   const followers = user.followers;
@@ -45,17 +47,24 @@ const UserProfile = ({ user: loggedInUser }) => {
     fetchUser();
   }, [params.id]);
   return (
-    <div>
+    <div className="pt-6 sm:px-8 bg-white min-h-screen">
       {user && (
         <div className="flex flex-col items-center justify-center">
           <div className="p-6 w-full">
-            <div className="flex items-center justify-center">
-              <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center">
-                {user.name && (
+            <div className="flex items-center justify-center mt-8 mb-4">
+              <div className="w-24 h-24 md:w-36 md:h-36 rounded-full bg-gray-300 flex items-center justify-center overflow-hidden">
+                {user.profilePicture ? (
+                  <img
+                    src={user.profilePicture}
+                    alt={user.name || 'Profile'}
+                    className="w-full h-full object-cover"
+                    style={{ height: '100%', width: '100%', maxHeight: '150px', maxWidth: '150px', minHeight: '96px', minWidth: '96px', borderRadius: '9999px', objectFit: 'cover' }}
+                  />
+                ) : user.name ? (
                   <span className="text-3xl text-gray-700">
                     {user.name.slice(0, 1)}
                   </span>
-                )}
+                ) : null}
               </div>
             </div>
 
@@ -71,13 +80,18 @@ const UserProfile = ({ user: loggedInUser }) => {
               <div className="flex justify-center mt-4 space-x-2">
                 <button
                   onClick={followHander}
-                  className="bg-gray-200 px-4 py-2 rounded"
+                  className={`px-4 py-2 rounded transition-colors duration-200 ${followLoading ? '' : isFollow ? 'bg-green-500 text-white hover:bg-green-600' : 'bg-red-500 text-white hover:bg-red-600'}`}
+                  disabled={followLoading}
                 >
-                  {isFollow ? "Unfollow" : " Follow"}
+                  {followLoading
+                    ? "Processing..."
+                    : isFollow
+                    ? "Unfollow"
+                    : "Follow"}
                 </button>
               </div>
             )}
-            <div className="mt-4 flex flex-wrap justify-center gap-4">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center">
               {userPins && userPins.length > 0 ? (
                 userPins.map((e) => <PinCard key={e._id} pin={e} />)
               ) : (

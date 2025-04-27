@@ -2,12 +2,13 @@ import express from "express";
 import { isAuth } from "../middleware/isAuth.js";
 import uploadFile from "../middleware/multer.js";
 import {
-  commentOnPin,
   createPin,
   deleteComment,
   deletePin,
   getAllPins,
   getSinglePin,
+  saveOrUnsavePin,
+  getSavedPins,
   updatePin,
 } from "../controllers/pinController.js";
 import mongoose from "mongoose";
@@ -17,6 +18,7 @@ const router = express.Router();
 
 router.post("/new", isAuth, uploadFile, createPin);
 router.get("/all", isAuth, getAllPins);
+router.get('/savedpins',isAuth, getSavedPins);
 router.get("/:id", isAuth, getSinglePin);
 router.put("/:id", isAuth, updatePin);
 router.delete("/:id", isAuth, deletePin);
@@ -48,5 +50,6 @@ router.post("/comment/:id", isAuth, async (req, res) => {
   }
 });
 router.delete("/comment/:id", isAuth, deleteComment);
+router.post('/save/:id',isAuth, saveOrUnsavePin);
 
 export default router;

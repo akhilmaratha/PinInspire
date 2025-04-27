@@ -1,6 +1,7 @@
 import { Pin } from "../models/pinModel.js";
 import getDataUri from "../utils/urlGenerator.js";
 import cloudinary from "cloudinary";
+import { User } from "../models/userModel.js";
 
 export const createPin = async (req, res) => {
   try {
@@ -187,5 +188,46 @@ export const updatePin = async (req, res) => {
     res.status(500).json({
       message: error.message
     });
+  }
+};
+
+// Save or Unsave a Pin
+export const saveOrUnsavePin = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const pinId = req.params.id;
+    // if (!mongoose.Types.ObjectId.isValid(pinId)) {
+    //   return res.status(400).json({ message: "Invalid pin ID" });
+    // }
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    const alreadySaved = user.savedPins.includes(pinId);
+    if (alreadySaved) {
+      user.savedPins = user.savedPins.filter(id => id.toString() !== pinId);
+      await user.save();
+      return res.json({ message: 'Pin unsaved', saved: false });
+    } else {
+      user.savedPins.push(pinId);
+      await user.save();
+      return res.json({ message: 'Pin saved', saved: true });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get all saved pins for user
+export const getSavedPins = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    // console.log(userId);
+    const user = await User.findById(userId).populate({
+      path: 'savedPins',
+      populate: { path: 'owner', select: '-password' }
+    });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    res.json(user.savedPins);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

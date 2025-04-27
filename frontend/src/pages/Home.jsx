@@ -1,27 +1,15 @@
 import { useEffect } from "react";
-// import { PlusCircle, LogOut, User } from 'lucide-react';
 import { PinData } from "../context/PinContext";
 import { Loading } from "../components/Loading";
 import PinCard from "../components/PinCard";
-// import { Link } from "react-router-dom";
+
 import Navbar from "../components/Navbar";
-// Button component
-// const Button = ({ children, className, ...props }) => (
-//   <button
-//     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${className}`}
-//     {...props}
-//   >
-//     {children}
-//   </button>
-// );
+
 
 export default function PinterestLayout() {
-  const { loading, filteredPins } = PinData(); // Remove setPins and pins since we don't need them here
-
-  // Infinite scroll behavior
+  const { loading, filteredPins } = PinData(); 
   const loadMorePins = () => {
-    // In a real app, this would fetch more pins from an API
-    // Add mock or new data here if needed
+
   };
 
   useEffect(() => {

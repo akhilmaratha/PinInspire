@@ -30,6 +30,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    savedPins: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Pin',
+        default: []
+    }],
 },{timestamps:true})
 
 export const User= mongoose.model("User", userSchema);

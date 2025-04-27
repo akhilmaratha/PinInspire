@@ -2,9 +2,11 @@ import { FaBell, FaUser } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
 import { PinData } from '../context/PinContext';
+import { UserData } from '../context/UserContext';
 
-const Navbar = ({ user }) => {
+const Navbar = () => {
   const { searchQuery, setSearchQuery } = PinData();
+  const { user } = UserData();
 
   const handleInputChange = (event) => {
     setSearchQuery(event.target.value);
@@ -57,21 +59,23 @@ const Navbar = ({ user }) => {
             </button>
             <Link
               to="/account"
-              className="h-11 w-11 rounded-full bg-gray-300 flex items-center justify-center text-xl text-gray-700"
+              className="h-11 w-11 rounded-full bg-gray-300 flex items-center justify-center text-xl text-gray-700 overflow-hidden"
             >
-              {user?.name?.slice(0, 1).toUpperCase() || <FaUser className="h-5 w-5" />}
+              {user?.profilePicture ? (
+                <img
+                  src={user.profilePicture}
+                  alt={user.name || 'Profile'}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                user?.name?.slice(0, 1).toUpperCase() || <FaUser className="h-5 w-5" />
+              )}
             </Link>
           </div>
         </div>
       </div>
     </nav>
   );
-};
-
-Navbar.propTypes = {
-  user: PropTypes.shape({
-    name: PropTypes.string
-  })
 };
 
 export default Navbar;

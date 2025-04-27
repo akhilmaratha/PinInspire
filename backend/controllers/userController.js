@@ -1,7 +1,10 @@
 import { User } from "../models/userModel.js";
 import bcrypt from "bcrypt";
-
+import cloudinary from "cloudinary";
 import generateToken from "../utils/generateToken.js";
+// import streamifier from "streamifier"; // Add this import at the top
+// import  DataUriParser from 'datauri/parser';
+import getDataUri from "../utils/urlGenerator.js";
 
 export const registerUser = async (req, res) => {
   try {
@@ -171,5 +174,43 @@ export const updateUser = async (req, res) => {
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+export const uploadProfileImage = async (req, res) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ message: "Please upload an image" });
+    }
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+
+    const fileUri = getDataUri(file);
+
+    // Upload to Cloudinary
+    const myCloud = await cloudinary.v2.uploader.upload(fileUri.content, {
+      folder: "profile_images",
+      resource_type: "image"
+    });
+
+    user.profilePicture = myCloud.secure_url;
+    await user.save();
+
+    res.status(201).json({
+      message: "Profile image updated",
+      profilePicture: myCloud.secure_url,
+      user
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({
+      message: error.message
+    });
   }
 };

@@ -5,8 +5,11 @@ import { followAndUnfollowUser,
     myProfile, 
     registerUser, 
     userProfile,
-    updateUser } from '../controllers/userController.js';
+    updateUser,
+    uploadProfileImage } from '../controllers/userController.js';
 import { isAuth } from '../middleware/isAuth.js';
+import multer from "multer";
+import uploadFile from "../middleware/multer.js";
 
 const router=express.Router();
 
@@ -17,7 +20,6 @@ router.get("/logout", isAuth, logOutUser);
 router.get('/:id',isAuth,userProfile);
 router.post('/follow/:id',isAuth,followAndUnfollowUser);
 router.put('/update', isAuth, updateUser);
-
-
+router.post("/profile-image", isAuth, uploadFile, uploadProfileImage);
 
 export default router;
